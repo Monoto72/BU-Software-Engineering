@@ -10,4 +10,37 @@
 {% include 'components/navbar.html' %}
 {% block header %} {% endblock %}
 
+<header class='h-60 bg-no-repeat bg-center bg-gray-700 block shadow-inner'
+    style='background-image: url({% static 'images/landing.jpg'%})'>
+    <div class='h-full w-full bg-black bg-opacity-50 flex flex-col justify-center items-center text-center'>
+        <h1 class='text-3xl font-bold text-white font-mono'>We provide the Recipes</h1>
+        <h2 class='text-2xl text-white font-mono'>You provide the Ingredients</h2>
+    </div>
+</header>
+
+<section class='flex flex-col justify-center items-center text-center w-2/3 mx-auto mt-4'>
+    <h1 class='text-2xl font-bold text-gray-700 border-b-4 border-blue-400 rounded-b-lg mb-2'>What is BetterCook?</h1>
+    <p class='text-1xl text-gray-700'>Here, you can enter the ingredients
+        that you have on hand and we will provide you with a delicious and easy-to-follow recipe that you can make at
+        home. Simply enter the ingredients that you have available, and our advanced search algorithms will scour our
+        database of thousands of recipes to find one that matches your ingredients. Whether you're a seasoned chef or
+        just starting out in the kitchen, our recipe search website has something for everyone. Give it a try and
+        discover a world of culinary possibilities with just a few simple ingredients.
+    </p>
+    <br>
+
+    <h1 class='text-2xl font-bold text-gray-700 border-b-4 border-blue-400 rounded-b-lg mb-2 mt-4'>How does it work?</h1>
+    <p class='text-1xl text-gray-700'>Our recipe search website is powered by a
+        combination of advanced search algorithms and a database of thousands of recipes. When you enter the ingredients
+        that you have available, our search algorithms will scour our database of recipes to find one that matches your
+        ingredients. We then provide you with a list of recipes that you can make with the ingredients that you have
+        available. You can then choose the recipe that you want to make and we will provide you with a step-by-step
+        guide to making it. It's that simple!
+    </p>
+    <a href='/recipes/search' class='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-6 mx-auto'>Search Recipe</a>
+</section>
+
+    {% include 'components/footer.html' %}
+    {% block footer %} {% endblock %}
+
 </html>
