@@ -9,26 +9,50 @@
 
 {% include 'components/navbar.html' %}
 {% block header %} {% endblock %}
+<div flex="flex flex-row">
+    <table class="flex flex-col w-full mt-2">
+        <tbody class="mx-auto p-4 rounded shadow-lg w-2/3">
+            <tr class="flex justify-between">
+                <th class="mx-auto w-1/4">Recipe</th>
+                <th class="mx-auto w-1/4">Time to Cook</th>
+                <th class="mx-auto w-1/4">Image</th>
+                <th class="mx-auto w-1/4">Go To</th>
+            </tr>
 
-<div class='flex flex-col md:flex-row w-full flex-wrap space-x-4 space-y-4'>
-    <div></div>
-    {% for recipe in recipes %}
-    <form method='post'>
+            {% for recipe in recipes %}
+            <tr class="flex justify-between content-center hover:bg-gray-100 hover:shadow-inner">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" id="recipe-name" name="recipe-name" value="{{ recipe.recipe }}}" />
+                    <td class="w-1/4">
+                        <img src="{{ recipe.image_url }}" class="rounded-full mx-auto"
+                            alt="Image of {{ recipe.recipe }}" style="width: 125px; height: 125px;">
+                    </td>
+                    <td class="text-center my-auto w-1/4">{{ recipe.recipe }}</td>
+                    <td class="text-center my-auto w-1/4">{{ recipe.time_to_cook }} Mins</td>
+                    <td class="text-center my-auto w-1/4">
+                        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                            Go To
+                        </button>
+                </form>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <form method="post" class="flex w-full mt-2">
         {% csrf_token %}
-        <input type="hidden" id="recipe-name" name="recipe-name" value="{{ recipe.recipe }}}" />
-        <button class="hover:shadow-2xl">
-            <div class='flex flex-col shadow-xl'>
-                <div class='bg-no-repeat bg-center'
-                    style=' width: 300px; height: 150px; background-image: url({{ recipe.image_url }});''>
-                    <h2 class="text-2xl bg-white w-1/2 rounded-br-lg shadow-xl">{{ recipe.time_to_cook }}</h2>
-                </div>
-                <div class='p-2'>
-                    {{ recipe.recipe }}
-                </div>
-            </div>
+        <input type="hidden" type="number" id="page-num" name="page-num" value="{{ page }}">
+        {% if page_check_prev %}
+        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mx-auto" id="page" name="page" value="prev">
+            Prev
         </button>
+        {% endif %}
+        {% if page_check_next %}
+        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mx-auto" id="page" name="page" value="next">
+            Next
+        </button>
+        {% endif %}
     </form>
-    {% endfor %}
 </div>
 
 {% include 'components/footer.html' %}

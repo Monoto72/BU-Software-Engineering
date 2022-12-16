@@ -1,0 +1,42 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang='en'>
+
+<!--Head-->
+{% include 'components/head.html' %}
+{% block head %} {% endblock %}
+
+{% include 'components/navbar.html' %}
+{% block header %} {% endblock %}
+
+<div class='flex flex-row w-full'>
+    {% include 'components/side-nav.html' %}
+    {% block sidenav %} {% endblock %}
+
+    <div class='flex flex-row space-x-4 space-y-4'>
+        <div></div>
+        {% for recipe in recipes %}
+        <form method='post'>
+            {% csrf_token %}
+            <input type="hidden" id="recipe-name" name="recipe-name" value="{{ recipe.name }}" />
+            <button class="hover:shadow-2xl">
+                <div class='flex flex-col shadow-xl'>
+                    <div class='bg-no-repeat bg-center'
+                        style=' width: 300px; height: 150px; background-image: url({{ recipe.image }});'>
+                        <h2 class="text-2xl bg-white w-1/2 rounded-br-lg shadow-xl">{{ recipe.time_to_cook }} Mins</h2>
+                    </div>
+                    <div class='p-2'>
+                        {{ recipe.name }}
+                    </div>
+                </div>
+            </button>
+        </form>
+        {% endfor %}
+    </div>
+</div>
+
+{% include 'components/footer.html' %}
+{% block footer %} {% endblock %}
+
+</html>

@@ -10,6 +10,73 @@
 {% include 'components/navbar.html' %}
 {% block header %} {% endblock %}
 
+<div class="flex flex-col items-center justify-center h-screen">
+    <div class="h-screen md:flex w-full">
+        <div
+            class="relative overflow-hidden md:flex w-1/2 bg-gradient-to-tr from-blue-400 to-purple-700 i justify-around items-center hidden">
+            <div class="flex justify-center items-center flex-col">
+                <h1 class="text-white font-bold text-4xl font-sans">BetterCook</h1>
+                <p class="text-white mt-1 w-1/2 text-center">Welcome to our recipe search website! Here, you can find
+                    delicious and healthy meals tailored to your specific dietary preferences and restrictions. Simply
+                    input your preferred ingredients and any allergens or intolerances you have, and we'll provide you
+                    with a list of recipes that meet your needs. Our database is constantly updated with new and
+                    creative recipes, so you'll never run out of meal ideas. Happy cooking! </p>
+                <p class="text-white mt-1 w-1/2 text-center mt-6">Please Ensure to read our TOS below</p>
+                <a href="/tos"
+                    class="block w-28 bg-white text-black-800 mt-4 py-2 rounded-2xl font-bold mb-2 text-center">Click
+                    here!</a>
+            </div>
+        </div>
+        <div class="flex md:w-1/2 justify-center py-10 items-center bg-white">
+            <form class="bg-white w-2/3" method="post">
+                {% csrf_token %}
+                <h1 class="text-gray-800 font-bold text-2xl mb-1">Welcome!</h1>
+                <p class="text-sm font-normal text-gray-600 mb-7">Want to save your favourite recipes?</p>
+                <div class="flex items-center border-2 py-2 px-3 rounded-2xl">
+                    <input class="pl-2 outline-none border-none w-full" type="text" name="username" id="id_username"
+                        placeholder="Username" autofocus maxlength="150" required />
+                </div>
+                <p class="text-xs text-gray-400 font-medium mb-2 text-center">Required. 150 characters or fewer.
+                    Letters, digits and @/./+/-/_ only.</p>
+                <div class="flex items-center border-2 py-2 px-3 rounded-2xl mb-4">
+                    <input class="pl-2 outline-none border-none w-full" type="text" name="first_name" id="id_first_name"
+                        placeholder="First Name" autofocus maxlength="50" required />
+                </div>
+                <div class="flex items-center border-2 py-2 px-3 rounded-2xl mb-4">
+                    <input class="pl-2 outline-none border-none w-full" type="text" name="last_name" id="id_last_name"
+                        placeholder="Last Name" autofocus maxlength="50" required />
+                </div>
+                <div class="flex items-center border-2 py-2 px-3 rounded-2xl mb-4">
+                    <input class="pl-2 outline-none border-none w-full" type="email" name="email" id="id_email"
+                        placeholder="Email">
+                </div>
+                <div class="flex items-center border-2 py-2 px-3 rounded-2xl">
+                    <input class="pl-2 outline-none border-none w-full" type="password" name="password1"
+                        id="id_password1" auto-complete="new-password" aria-autocomplete="list" placeholder="Password">
+                </div>
+                <p class="text-xs text-gray-400 font-medium mb-2 text-center">Your password can’t be too similar to your
+                    other personal information.<br>Your password must contain at least 8 characters.<br>Your password
+                    can’t be a commonly used
+                    password.<br>Your password can’t be entirely
+                    numeric.</p>
+                <div class="flex items-center border-2 py-2 px-3 rounded-2xl">
+                    <input class="pl-2 outline-none border-none w-full" type="password" name="password2"
+                        id="id_password2" auto-complete="new-password" aria-autocomplete="list" placeholder="Password">
+                </div>
+                <p class="text-xs text-gray-400 font-medium mb-2 text-center mb-2">Enter the same password as before, for verification.</p>
+                {% for error in field.errors %}
+                <p class="text-xs text-red-400 font-medium mb-2 text-center">{{ error }}</p>
+                {% endfor %}
+                <button type="submit" name="submit" id="submit"
+                    class="block w-full bg-green-600 mt-4 py-2 rounded-2xl text-white font-semibold mb-2">Register
+                    Account</button>
+                <a href="/login"><span class="text-sm ml-2 hover:text-blue-500 cursor-pointer">Log in
+                        instead</span></a>
+            </form>
+        </div>
+    </div>
+</div>
+
 {% include 'components/footer.html' %}
 {% block footer %} {% endblock %}
 

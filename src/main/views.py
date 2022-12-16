@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import AuthenticationForm
 from . import api_functions as api
+from main.models import FavoriteRecipe
 
 # Create your views here.
 
@@ -13,21 +14,40 @@ def index(request):
     return render(request, 'index.html', {'page_url': url})
 
 def recipes(request):
-    url = 'recipes'
-
-    if request.method == 'POST':
-        # Get the recipe name, starting positsion and offset from the URL
-        recipe = request.POST['recipe']
-        page = request.POST['page']
-        per_page = request.POST['per_page']
+    url = 'Recipes'
+    page = 0
+    page_check_next = True
+    page_check_prev = False
     
-        recipes = api.getRecipeByName(recipe_filter=recipe, page=page, per_page=per_page) # Get the recipes from the API
+    if request.method == 'POST':
+        if request.POST.get('recipe-name'): 
+            recipe = api.getRecipeByName(request.POST.get('recipe-name')[:1])
+            return render(request, 'random.html', {'page_url': url, 'recipe': recipe[0]})# Get the recipe name, starting positsion and offset from the URL
+        if request.POST.get('page'):
+            page = int(request.POST.get('page-num'))
+            if request.POST.get('page') == 'next':
+                page += 5
+                page_check_prev = True
+            if request.POST.get('page') == 'prev':
+                if (page < 0):
+                    page = 0
+                if (page > 0):
+                    page -= 5
+                    page_check_prev = True
+                if (page == 0):
+                    page_check_prev = False
+        per_page = 5
+        
+        recipes = api.getRecipeByName(page=page, per_page=per_page) # Get the recipes from the API
+        if  len(recipes) < 5:
+            page_check_next = False
+            
     if request.method == 'GET':
         recipes = api.getRecipeByName(page=0, per_page=5) # Get the recipes from the API
         
     # Need to display it on the page
         
-    return render(request, 'recipes.html', {'page_url': url})
+    return render(request, 'recipes.html', {'page_url': url, 'recipes': recipes, 'page': page, 'page_check_next': page_check_next, 'page_check_prev': page_check_prev})
 
 def search(request):
     
@@ -50,21 +70,37 @@ def search(request):
             recipes = api.getRecipes(ingredients)
             recipes = recipes['recipes']
 
-            return render(request, 'recipes.html', {'page_url': url, 'recipes': recipes})
+            return render(request, 'list-recipes.html', {'page_url': url, 'recipes': recipes})
     return render(request, 'search.html', {'page_url': url})
 
 
 def random(request):
     url = 'Random'
     json = api.getRandomRecipe()
+    favourited = True
     
-    json['time'] = readable_time(json['time_to_cook'])
-    json['prep_time'] = readable_time(json['time_to_prep'])
+    json['time'] = json['time_to_cook']
+    json['time_to_cook'] = readableTime(json['time_to_cook'])
+    json['time_to_prep'] = readableTime(json['time_to_prep'])
     
-    return render(request, 'random.html', {'page_url': url, 'recipe': json})
+    if request.user.is_authenticated:
+        recipe = FavoriteRecipe.objects.filter(recipe_name=json['recipe'], user=request.user)
+        if recipe:
+            favourited = False
+    
+    if request.method == 'POST':
+        print(request.POST)
+        if request.POST.get('recipe-add'):
+            favourite_recipe(request.POST.get('recipe-add'), request.POST.get('recipe-image'), request.POST.get('recipe-time'), request.user)
+            return redirect("/")
+        if request.POST.get('recipe-remove'):
+            unfavourite_recipe(request.POST.get('recipe-remove'), request.POST.get('recipe-image'), request.POST.get('recipe-time'), request.user)
+            return redirect("/")
+    
+    return render(request, 'random.html', {'page_url': url, 'recipe': json, 'favourited': favourited})
 
 
-def readable_time(time):
+def readableTime(time):
     seconds = time * 60
     seconds = seconds % (24 * 3600)
     hour = seconds // 3600
@@ -75,7 +111,7 @@ def readable_time(time):
     return "%dh %02dm %02ds" % (hour, minutes, seconds)
 
 
-def login(request):
+def loginAuth(request):
     if request.user.is_authenticated:
         return redirect("/")
 
@@ -96,19 +132,18 @@ def login(request):
             messages.error(request,"Invalid username or password.")
     else:
         form = AuthenticationForm()
-    return render(request, "login.html", { "login_form": form, "page_url": url})
+    return render(request, "login.html", {"page_url": url})
 
 
-def logout(request):
+def logoutAuth(request):
     if request.user.is_authenticated:
         logout(request)
         return redirect("/")
-        # Could add a see you next time
     else:
         return redirect("/")
 
 
-def register_req(request):
+def registerAuth(request):
     if request.user.is_authenticated:
         return redirect("/")
 
@@ -126,37 +161,38 @@ def register_req(request):
         messages.error(request, "Unsuccessful registration. Invalid information.")
     else:
         form = CreateUserForm()
-    return render (request, 'register.html', {"register_form": form, "page_url": url })
+    return render (request, 'register.html', {"page_url": url })
 
 
+def profile(request):
+    url = "Profile"
+    favourites = []
+    
+    if request.user.is_authenticated:
+        if request.GET.get('panel'):
+            if request.GET.get('panel') == 'favourites':
+                recipes = FavoriteRecipe.objects.filter(user=request.user)
+                for recipe in recipes:
+                    json = {'name': recipe.recipe_name, 'image': recipe.recipe_image, 'time_to_cook': recipe.recipe_time_to_cook}
+                    favourites.append(json)
+                    
+        if request.method == 'POST':
+            if request.POST.get('recipe-name'):
+                recipe = api.getRecipeByName(request.POST.get('recipe-name')[:1])
+                return render(request, 'random.html', {'page_url': url, 'recipe': recipe})
+                    
+        return render(request, 'profile.html', {'page_url': url, 'recipes': favourites})
+    return render(request, 'index.html', {'page_url': url})
+    
+    
+def tos(request):
+    url = "TOS"
+    return render(request, 'tos.html', {'page_url': url})
 
-def dummyRecipe():
-    return {
-        "recipe": "Hunters Chicken",
-        "time": 50,
-        "prep_time": 15,
-        "difficulty": "Easy",
-        "serves": 4,
-        "instructions": [
-            "Heat oven to 200C/180C fan/gas 6. Oil a tray, put the chicken breasts on it and cover each one with 2 bacon rashers. Put the chicken in the oven for 20-25 mins until cooked through.",
-            "While the chicken is cooking, fry the onion in 1 tbsp oil until golden brown and soft, then set aside. Put the potatoes in a large pan of boiling water and cook for 10-15 mins until soft. Put another smaller pan of water on the hob and bring to the boil while the potatoes are cooking. Once boiling, tip in the runner beans and carrots and cook for 8-10 mins until soft but with a little bite. Drain the potatoes and put them back in the pan with the milk and cream cheese, mash until smooth and stir though the fried onions.",
-            "Once the chicken is cooked, pour over the BBQ sauce and scatter over the parmesan and return to the oven for 2 mins until the cheese has melted. Serve with the mash, carrots and runner beans."
-        ],
-        "ingredients": [
-            "4 chicken breasts",
-            "8 rashers of bacon",
-            "1 onion, sliced",
-            "1 red pepper, sliced",
-            "1 tbsp tomato puree",
-            "1 tbsp Worcestershire sauce",
-            "1 tbsp Dijon mustard",
-            "1 tbsp honey",
-            "1 tbsp soy sauce",
-            "1 tbsp olive oil",
-            "1 tbsp balsamic vinegar",
-            "1 tbsp cornflour",
-            "1 tbsp water",
-            "1 tbsp chopped parsley"
-        ],
-        "image_url": "https://www.kitchensanctuary.com/wp-content/uploads/2021/03/Hunters-chicken-Tall-FS-37.webp"
-    }
+
+def favourite_recipe(recipe_name, recipe_image, recipe_time_to_cook, user):
+    FavoriteRecipe.objects.create(recipe_name=recipe_name, recipe_image=recipe_image, recipe_time_to_cook=recipe_time_to_cook, user=user)
+    
+def unfavourite_recipe(recipe_name, recipe_image, recipe_time_to_cook, user):
+    FavoriteRecipe.objects.filter(recipe_name=recipe_name, user=user).delete()
+    

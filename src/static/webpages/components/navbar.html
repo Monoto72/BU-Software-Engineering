@@ -25,9 +25,21 @@
         {% endif %}
         
         {% if page_url == "Login" %}
-        <a href="/login" class="bg-white p-4 pt-2 text-black font-semibold rounded-t-lg hover:bg-gray-100">Login</a>
+            {% if user.is_authenticated %}
+            <a href="/logout" class="bg-white p-4 pt-2 text-black font-semibold rounded-t-lg hover:bg-gray-100">{{ user.username }}</a>
+            {% else %}
+            <a href="/login" class="bg-white p-4 pt-2 text-black font-semibold rounded-t-lg hover:bg-gray-100">Login</a>
+            {% endif %}
         {% else %}
-        <a href="/login" class="hover:border-b-4">Login</a>
+            {% if user.is_authenticated %}
+                {% if page_url == "Profile" %}
+                    <a href="/profile" class="bg-white p-4 pt-2 text-black font-semibold rounded-t-lg hover:bg-gray-100">{{ user.username }}</a>
+                {% else %}
+                    <a href="/profile" class="hover:border-b-4">{{ user.username }}</a>
+                {% endif %}
+            {% else %}
+                <a href="/login" class="hover:border-b-4">Login</a>
+            {% endif %}
         {% endif %}
     </div>
 </nav>
