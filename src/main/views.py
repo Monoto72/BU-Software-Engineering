@@ -33,6 +33,10 @@ def search(request):
     url = 'Search';
     
     if request.method == 'POST':
+        if request.POST['recipe-name']:
+            print(request.POST['recipe-name'][:-1])
+            return
+        
         count = 1;
         ingredients = []
         
@@ -41,10 +45,11 @@ def search(request):
             if key == field:
                 ingredients.append(request.POST[key])
                 count += 1
-
-        # TODO: Place the result on the Page
+        
         recipes = api.getRecipes(ingredients)
-        recipes = recipes['recipes'] # Extract the list of recipes from the data
+        recipes = recipes['recipes']
+        print(recipes)
+        return render(request, 'recipes.html', {'page_url': url, 'recipes': recipes})
     
     return render(request, 'search.html', {'page_url': url})
 
@@ -52,8 +57,8 @@ def random(request):
     url = 'Random'
     json = api.getRandomRecipe()
     
-    json['time'] = readable_time(json['time'])
-    json['prep_time'] = readable_time(json['prep_time'])
+    json['time'] = readable_time(json['time_to_cook'])
+    json['prep_time'] = readable_time(json['time_to_prep'])
     
     return render(request, 'random.html', {'page_url': url, 'recipe': json})
 
