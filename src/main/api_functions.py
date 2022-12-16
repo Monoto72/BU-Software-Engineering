@@ -31,8 +31,11 @@ def getRecipes(ingredients):
                 # Loops through each ingredient in the recipe
                 for recipe_ingredient in recipe_ingredients:
                     if ingredient in recipe_ingredient:
-                        matching_recipes.append(recipe)
-                        break
+                        # check if the recipe is already in the list
+                        if recipe not in matching_recipes:
+                            # Add the recipe to the list
+                            matching_recipes.append(recipe)
+                            break
 
     # Return the list of matching recipes as a JSON response
     return {'recipes': matching_recipes}

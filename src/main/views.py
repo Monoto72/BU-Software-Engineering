@@ -30,27 +30,31 @@ def recipes(request):
     return render(request, 'recipes.html', {'page_url': url})
 
 def search(request):
+    
     url = 'Search';
-    
+
     if request.method == 'POST':
-        if request.POST['recipe-name']:
+        if request.POST.get('recipe-name'):
             print(request.POST['recipe-name'][:-1])
-            return
+
+        else:
+            count = 1;
+            ingredients = []
         
-        count = 1;
-        ingredients = []
+            for key in request.POST:
+                field = 'ingredient-' + str(count)
+                if key == field:
+                    ingredients.append(request.POST[key])
+                    count += 1
         
-        for key in request.POST:
-            field = 'ingredient-' + str(count)
-            if key == field:
-                ingredients.append(request.POST[key])
-                count += 1
-        
-        recipes = api.getRecipes(ingredients)
-        recipes = recipes['recipes']
-        print(recipes)
-        return render(request, 'recipes.html', {'page_url': url, 'recipes': recipes})
-    
+            recipes = api.getRecipes(ingredients)
+            recipes = recipes['recipes']
+            print(recipes)
+
+            return render(request, 'recipes.html', {'page_url': url, 'recipes': recipes})
+
+   
+
     return render(request, 'search.html', {'page_url': url})
 
 def random(request):
