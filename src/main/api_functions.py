@@ -25,17 +25,22 @@ def getRecipes(ingredients):
             # Extract the list of ingredients from the recipe
             recipe_ingredients = recipe['ingredients']
 
+            # Set Counter
+            counter = 0
+            
             # loop though each ingredient in the array
             for ingredient in ingredients:
-                
                 # Loops through each ingredient in the recipe
                 for recipe_ingredient in recipe_ingredients:
                     if ingredient in recipe_ingredient:
-                        # check if the recipe is already in the list
-                        if recipe not in matching_recipes:
-                            # Add the recipe to the list
-                            matching_recipes.append(recipe)
-                            break
+                        # Increment the counter
+                        counter += 1
+                
+                # check if the recipe is already in the list and if 2 or more ingredients match
+                if recipe not in matching_recipes and counter >= 2:
+                    # Add the recipe to the list
+                    matching_recipes.append(recipe)
+                    break
 
     # Return the list of matching recipes as a JSON response
     return {'recipes': matching_recipes}
