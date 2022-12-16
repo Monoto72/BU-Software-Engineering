@@ -8,7 +8,6 @@ path = os.path.join(os.path.dirname(__file__), 'recipes.json')
 
 # Get recipes from an array of ingredients
 def getRecipes(ingredients):
-    print(ingredients)
     # Open the recipe.json file
     with open(path, 'r') as f:
         # Loads the json file
