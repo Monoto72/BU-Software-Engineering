@@ -35,8 +35,8 @@ def search(request):
 
     if request.method == 'POST':
         if request.POST.get('recipe-name'):
-            print(request.POST['recipe-name'][:-1])
-
+            recipe = api.getRecipeByName(request.POST.get('recipe-name')[:1])
+            return render(request, 'random.html', {'page_url': url, 'recipe': recipe[0]})
         else:
             count = 1;
             ingredients = []
@@ -49,13 +49,10 @@ def search(request):
         
             recipes = api.getRecipes(ingredients)
             recipes = recipes['recipes']
-            print(recipes)
 
             return render(request, 'recipes.html', {'page_url': url, 'recipes': recipes})
-
-   
-
     return render(request, 'search.html', {'page_url': url})
+
 
 def random(request):
     url = 'Random'

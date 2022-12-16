@@ -19,11 +19,11 @@
     <form method="POST" class="flex flex-col bg-gray-100 w-1/3 mx-auto bg-gray-100 shadow-inner p-6 space-y-2 rounded">
         {% csrf_token %}
         <input id="ingredient-1" name="ingredient-1" placeholder="Cheese" class="w-full p-3 pl-2 shadow-inner"
-            ></input>
+            required></input>
         <input id="ingredient-2" name="ingredient-2" placeholder="Potatoes" class="w-full p-3 pl-2 shadow-inner"
-            ></input>
+            required></input>
         <input id="ingredient-3" name="ingredient-3" placeholder="Broccoli" class="w-full p-3 pl-2 shadow-inner"
-            ></input>
+            required></input>
         <div id="content" class="w-full flex items-center justify-between space-x-2">
             <button id="submit"
                 class="p-3 pl-2 text-white bg-gray-800 hover:bg-gray-700 w-1/2 mx-auto shadow-lg font-bold rounded-full hover:shadow-md mt-2">Search</button>
