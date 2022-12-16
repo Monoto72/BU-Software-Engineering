@@ -6,4 +6,5 @@ urlpatterns = [
     path('recipes', views.recipes, name='recipes'),
     path('recipes/search', views.search, name='search'),
     path('recipes/random', views.random, name='random'),
+    path('login', views.login, name='login'),
 ]

@@ -6,22 +6,28 @@
         <a href="/" class="ml-2 text-xl font-bold text-white">BetterCook</a>
     </div>
     <div class="justify-end my-auto text-white space-x-4 mr-2">
-        {% if page_url == "recipes" %}
+        {% if page_url == "Recipes" %}
         <a href="/recipes" class="bg-white p-4 pt-2 text-black font-semibold rounded-t-lg hover:bg-gray-100">Recipes</a>
         {% else %}
         <a href="/recipes" class="hover:border-b-4">Recipes</a>
         {% endif %}
 
-        {% if page_url == "random" %}
+        {% if page_url == "Random" %}
         <a href="/recipes/random" class="bg-white p-4 pt-2 text-black font-semibold rounded-t-lg hover:bg-gray-100">Random</a>
         {% else %}
         <a href="/recipes/random" class="hover:border-b-4">Random</a>
         {% endif %}
 
-        {% if page_url == "search" %}
+        {% if page_url == "Search" %}
         <a href="/recipes/search" class="bg-white p-4 pt-2 text-black font-semibold rounded-t-lg hover:bg-gray-100">Search</a>
         {% else %}
         <a href="/recipes/search" class="hover:border-b-4">Search</a>
+        {% endif %}
+        
+        {% if page_url == "Login" %}
+        <a href="/login" class="bg-white p-4 pt-2 text-black font-semibold rounded-t-lg hover:bg-gray-100">Login</a>
+        {% else %}
+        <a href="/login" class="hover:border-b-4">Login</a>
         {% endif %}
     </div>
 </nav>

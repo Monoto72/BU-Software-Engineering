@@ -1,18 +1,22 @@
 from django.shortcuts import render, redirect
 from django.views.generic import TemplateView
+from .forms import CreateUserForm
+from django.contrib import messages
+from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.forms import AuthenticationForm
 
 # Create your views here.
 
 def index(request):
-    url = 'home'
+    url = 'Home'
     return render(request, 'index.html', {'page_url': url})
 
 def recipes(request):
-    url = 'recipes'
+    url = 'Recipes'
     return render(request, 'recipes.html', {'page_url': url})
 
 def search(request):
-    url = 'search';
+    url = 'Search';
     
     if request.method == 'POST':
         count = 1;
@@ -29,7 +33,7 @@ def search(request):
     return render(request, 'search.html', {'page_url': url})
 
 def random(request):
-    url = 'random'
+    url = 'Random'
     json = dummyRecipe()
     
     json['time'] = readable_time(json['time'])
@@ -47,6 +51,67 @@ def readable_time(time):
     seconds %= 60
     
     return "%dh %02dm %02ds" % (hour, minutes, seconds)
+
+
+def login(request):
+    if request.user.is_authenticated:
+        return redirect("/")
+
+    url = "Login"
+    if request.method == "POST":
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                messages.info(request, f"You successfully logged in as {username}.")
+                return redirect("/")
+            else:
+                messages.error(request,"Invalid username or password.")
+        else:
+            messages.error(request,"Invalid username or password.")
+    else:
+        form = AuthenticationForm()
+    return render(request, "login.html", { "login_form": form, "page_url": url})
+
+
+def logout(request):
+    """Log-out functionality
+    Ensuring a users account doesn't get abused when `AFK`
+    Args:
+        request (object): Returns metadata
+    Returns:
+        route: Redirects to the homepage after logging out
+    """
+    if request.user.is_authenticated:
+        logout(request)
+        return redirect("/")
+        # Could add a see you next time
+    else:
+        return redirect("/")
+
+
+def register_req(request):
+    if request.user.is_authenticated:
+        return redirect("/")
+
+    url = "Register"
+    if request.method == "POST":
+        form = CreateUserForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
+            login(request, user)
+            messages.success(request, "Registration successful." )
+            return redirect("/")
+        messages.error(request, "Unsuccessful registration. Invalid information.")
+    else:
+        form = CreateUserForm()
+    return render (request, 'register.html', {"register_form": form, "page_url": url })
 
 
 
