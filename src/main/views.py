@@ -4,6 +4,7 @@ from .forms import CreateUserForm
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import AuthenticationForm
+from . import api_functions as api
 
 # Create your views here.
 
@@ -12,7 +13,20 @@ def index(request):
     return render(request, 'index.html', {'page_url': url})
 
 def recipes(request):
-    url = 'Recipes'
+    url = 'recipes'
+
+    if request.method == 'POST':
+        # Get the recipe name, starting positsion and offset from the URL
+        recipe = request.POST['recipe']
+        page = request.POST['page']
+        per_page = request.POST['per_page']
+    
+        recipes = api.getRecipeByName(recipe_filter=recipe, page=page, per_page=per_page) # Get the recipes from the API
+    if request.method == 'GET':
+        recipes = api.getRecipeByName(page=0, per_page=5) # Get the recipes from the API
+        
+    # Need to display it on the page
+        
     return render(request, 'recipes.html', {'page_url': url})
 
 def search(request):
@@ -27,14 +41,16 @@ def search(request):
             if key == field:
                 ingredients.append(request.POST[key])
                 count += 1
-                
-        # getRecipe(ingredients)
+
+        # TODO: Place the result on the Page
+        recipes = api.getRecipes(ingredients)
+        recipes = recipes['recipes'] # Extract the list of recipes from the data
     
     return render(request, 'search.html', {'page_url': url})
 
 def random(request):
     url = 'Random'
-    json = dummyRecipe()
+    json = api.getRandomRecipe()
     
     json['time'] = readable_time(json['time'])
     json['prep_time'] = readable_time(json['prep_time'])
@@ -78,13 +94,6 @@ def login(request):
 
 
 def logout(request):
-    """Log-out functionality
-    Ensuring a users account doesn't get abused when `AFK`
-    Args:
-        request (object): Returns metadata
-    Returns:
-        route: Redirects to the homepage after logging out
-    """
     if request.user.is_authenticated:
         logout(request)
         return redirect("/")
